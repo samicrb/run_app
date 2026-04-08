@@ -1,0 +1,8 @@
+{
+  "id": "com.example.drltaskrunner",
+  "name": "DRL Task Runner",
+  "category": "Process",
+  "type": "UserModule",
+  "version": "1.0.0",
+  "entry": "src/index.tsx"
+}
