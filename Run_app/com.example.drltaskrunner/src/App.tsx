@@ -4,21 +4,30 @@
 */
 import {
   Context,
+  FileHandler,
+  IFilePicker,
   IProgramManager,
+  IRobotManager,
   ModuleContext,
   ProgramState,
   ProgramStopType,
+  RobotMode,
 } from 'dart-api';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import StopIcon from '@mui/icons-material/Stop';
 import {
   Alert,
   Box,
-  Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -31,25 +40,20 @@ interface IAppProps {
 
 type UiExecutionState = 'IDLE' | 'RUNNING' | 'PAUSED' | 'STOPPED' | 'ERROR';
 
+type DiagnosticCode =
+  | 'OK'
+  | 'SERVO_OFF'
+  | 'NOT_AUTO_MODE'
+  | 'SERVO_OFF_AND_NOT_AUTO_MODE'
+  | 'NO_TASK_SELECTED';
+
+interface TaskItem {
+  name: string;
+  handler: FileHandler;
+}
+
 const MAX_LOG_ITEMS = 150;
-
-async function getTasksFromController(_: ModuleContext): Promise<string[]> {
-  // NOTE:
-  // SDK5 Dart API in this starter does not expose an API to list controller task files directly.
-  // This adapter keeps the UI ready and can be replaced later by your project-specific source.
-  return ['Task_08042026', 'Task_09042026', 'Task_10042026'];
-}
-
-function buildDrlFromTaskName(taskName: string): string {
-  // Minimal generated script. Replace this body with your real DRL task launcher command
-  // if your controller workflow requires another DRL entrypoint.
-  return [
-    'def __module_run_selected_task():',
-    `    tp_log("[TaskRunner] Selected task: ${taskName}")`,
-    '    tp_log("[TaskRunner] Execute your task call here.")',
-    '__module_run_selected_task()',
-  ].join('\n');
-}
+const CONTROL_BUTTON_SIZE = 88;
 
 function toUiState(programState: number): UiExecutionState {
   if (programState === ProgramState.PLAY) {
@@ -71,12 +75,15 @@ function App(props: IAppProps) {
   const { moduleContext } = props;
   const { t } = useTranslation(moduleContext.packageName);
 
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [selectedTask, setSelectedTask] = useState('');
   const [executionState, setExecutionState] =
     useState<UiExecutionState>('IDLE');
   const [logs, setLogs] = useState<string[]>([]);
-  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [statusMessage, setStatusMessage] = useState('');
+  const [diagnosticCode, setDiagnosticCode] =
+    useState<DiagnosticCode>('NO_TASK_SELECTED');
+  const [isLoadingTasks, setIsLoadingTasks] = useState(false);
 
   const programManager = useMemo(
     () =>
@@ -86,30 +93,18 @@ function App(props: IAppProps) {
     [moduleContext],
   );
 
+  const robotManager = useMemo(
+    () =>
+      moduleContext.getSystemManager(Context.ROBOT_MANAGER) as IRobotManager,
+    [moduleContext],
+  );
+
+  const filePicker = useMemo(
+    () => moduleContext.getSystemLibrary(Context.FILE_PICKER) as IFilePicker,
+    [moduleContext],
+  );
+
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchTasks = async () => {
-      try {
-        const nextTasks = await getTasksFromController(moduleContext);
-        if (!isMounted) {
-          return;
-        }
-        setTasks(nextTasks);
-        if (nextTasks.length > 0) {
-          setSelectedTask((prev) => (prev !== '' ? prev : nextTasks[0]));
-        }
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-        setExecutionState('ERROR');
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        setStatusMessage(t('taskLoadError', { error: errorMessage }));
-      }
-    };
-
     const onProgramState = (value: number) => {
       setExecutionState(toUiState(value));
     };
@@ -117,26 +112,88 @@ function App(props: IAppProps) {
       setLogs((prev) => [value, ...prev].slice(0, MAX_LOG_ITEMS));
     };
 
-    fetchTasks();
     programManager.programState.register(moduleContext, onProgramState, true);
     programManager.userLog.register(moduleContext, onProgramLog);
 
     return () => {
-      isMounted = false;
       programManager.programState.unregister(moduleContext, onProgramState);
       programManager.userLog.unregister(moduleContext, onProgramLog);
     };
-  }, [moduleContext, programManager, t]);
+  }, [moduleContext, programManager]);
+
+  useEffect(() => {
+    if (selectedTask === '') {
+      setDiagnosticCode('NO_TASK_SELECTED');
+    }
+  }, [selectedTask]);
 
   const addUiLog = (message: string) => {
     setLogs((prev) => [message, ...prev].slice(0, MAX_LOG_ITEMS));
   };
 
-  const handlePlayPause = async () => {
+  const refreshTasksFromController = async () => {
+    setStatusMessage('');
+    setIsLoadingTasks(true);
+    try {
+      const pickResult = await filePicker.showFilePicker({
+        multiple: true,
+        types: [
+          {
+            mimeType: 'text/plain',
+            extensions: ['.drl'],
+          },
+        ],
+      });
+
+      if (!pickResult.handlers || pickResult.handlers.length === 0) {
+        setStatusMessage(t('taskPickerCancelled'));
+        return;
+      }
+
+      const nextTasks = pickResult.handlers.map((handler) => ({
+        name: handler.name.replace(/\.drl$/i, ''),
+        handler,
+      }));
+      nextTasks.sort((a, b) => a.name.localeCompare(b.name));
+
+      setTasks(nextTasks);
+      setSelectedTask(nextTasks[0]?.name ?? '');
+      addUiLog(t('tasksLoaded', { count: nextTasks.length }));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      setExecutionState('ERROR');
+      setStatusMessage(t('taskLoadError', { error: errorMessage }));
+      addUiLog(t('taskLoadError', { error: errorMessage }));
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  };
+
+  const runPreflightDiagnostic = async (): Promise<DiagnosticCode> => {
     if (selectedTask === '') {
-      return;
+      return 'NO_TASK_SELECTED';
     }
 
+    const isServoOn = robotManager.isServoOn();
+    const robotMode = await robotManager.getRobotMode();
+    const isAutoMode = robotMode === RobotMode.AUTONOMOUS;
+
+    if (!isServoOn && !isAutoMode) {
+      return 'SERVO_OFF_AND_NOT_AUTO_MODE';
+    }
+    if (!isServoOn) {
+      return 'SERVO_OFF';
+    }
+    if (!isAutoMode) {
+      return 'NOT_AUTO_MODE';
+    }
+
+    return 'OK';
+  };
+
+  const handlePlayPause = async () => {
+    setStatusMessage('');
     try {
       if (executionState === 'RUNNING') {
         const paused = await programManager.pauseProgram();
@@ -158,9 +215,28 @@ function App(props: IAppProps) {
         return;
       }
 
-      const script = buildDrlFromTaskName(selectedTask);
+      const preflight = await runPreflightDiagnostic();
+      setDiagnosticCode(preflight);
+      if (preflight !== 'OK') {
+        const msg = t(`diagnostic.${preflight.toLowerCase()}`);
+        setStatusMessage(msg);
+        addUiLog(msg);
+        return;
+      }
+
+      const task = tasks.find((item) => item.name === selectedTask);
+      if (!task) {
+        setDiagnosticCode('NO_TASK_SELECTED');
+        return;
+      }
+
+      const fileReadResult = await task.handler.read();
+      if (!fileReadResult.data) {
+        throw new Error(t('taskReadFailed', { task: selectedTask }));
+      }
+
       const started = await programManager.runProgram(
-        script,
+        fileReadResult.data,
         null,
         null,
         false,
@@ -168,6 +244,8 @@ function App(props: IAppProps) {
       if (!started) {
         throw new Error(t('startFailed'));
       }
+
+      setDiagnosticCode('OK');
       addUiLog(t('startedTask', { task: selectedTask }));
       setExecutionState('RUNNING');
     } catch (error) {
@@ -180,6 +258,7 @@ function App(props: IAppProps) {
   };
 
   const handleStop = async () => {
+    setStatusMessage('');
     try {
       const stopped = await programManager.stopProgram(ProgramStopType.QUICK);
       if (!stopped) {
@@ -205,12 +284,13 @@ function App(props: IAppProps) {
   const canStop =
     isTaskSelected &&
     (executionState === 'RUNNING' || executionState === 'PAUSED');
-  let playPauseLabel = t('play');
-  if (executionState === 'RUNNING') {
-    playPauseLabel = t('pause');
-  } else if (executionState === 'PAUSED') {
-    playPauseLabel = t('resume');
-  }
+
+  const playPauseIcon =
+    executionState === 'RUNNING' ? (
+      <PauseIcon fontSize="large" />
+    ) : (
+      <PlayArrowIcon fontSize="large" />
+    );
 
   return (
     <Box className={styles['process-container']}>
@@ -220,21 +300,35 @@ function App(props: IAppProps) {
           {t('subtitle')}
         </Typography>
 
-        <FormControl fullWidth size="small">
-          <InputLabel id="task-select-label">{t('taskLabel')}</InputLabel>
-          <Select
-            labelId="task-select-label"
-            value={selectedTask}
-            label={t('taskLabel')}
-            onChange={onTaskChange}
-          >
-            {tasks.map((task) => (
-              <MenuItem key={task} value={task}>
-                {task}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <FormControl fullWidth size="small">
+            <InputLabel id="task-select-label">{t('taskLabel')}</InputLabel>
+            <Select
+              labelId="task-select-label"
+              value={selectedTask}
+              label={t('taskLabel')}
+              onChange={onTaskChange}
+            >
+              {tasks.map((task) => (
+                <MenuItem key={task.name} value={task.name}>
+                  {task.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Tooltip title={t('refreshTasks')}>
+            <span>
+              <IconButton
+                color="primary"
+                onClick={refreshTasksFromController}
+                disabled={isLoadingTasks}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Stack>
 
         <Stack
           direction="row"
@@ -251,23 +345,32 @@ function App(props: IAppProps) {
           </Alert>
         </Stack>
 
-        <Stack direction="row" spacing={1}>
-          <Button
-            variant="contained"
+        <Alert severity={diagnosticCode === 'OK' ? 'success' : 'warning'}>
+          {t(`diagnostic.${diagnosticCode.toLowerCase()}`)}
+        </Alert>
+
+        <Stack direction="row" spacing={2}>
+          <IconButton
             color="primary"
-            disabled={!canPlayPause}
+            className={styles['control-button']}
             onClick={handlePlayPause}
+            disabled={!canPlayPause}
+            aria-label={t('playPauseAria')}
+            sx={{ width: CONTROL_BUTTON_SIZE, height: CONTROL_BUTTON_SIZE }}
           >
-            {playPauseLabel}
-          </Button>
-          <Button
-            variant="outlined"
+            {playPauseIcon}
+          </IconButton>
+
+          <IconButton
             color="error"
-            disabled={!canStop}
+            className={styles['control-button']}
             onClick={handleStop}
+            disabled={!canStop}
+            aria-label={t('stop')}
+            sx={{ width: CONTROL_BUTTON_SIZE, height: CONTROL_BUTTON_SIZE }}
           >
-            {t('stop')}
-          </Button>
+            <StopIcon fontSize="large" />
+          </IconButton>
         </Stack>
 
         {statusMessage !== '' && (

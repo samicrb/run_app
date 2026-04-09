@@ -1,20 +1,22 @@
 {
   "com.example.drltaskrunner": {
     "title": "DRL Process Task Runner",
-    "subtitle": "Select a controller task and control execution with Play/Pause/Stop.",
-    "taskLabel": "Task",
+    "subtitle": "Load existing .drl tasks from the controller, then run with Play/Pause/Stop.",
+    "taskLabel": "Controller task",
     "stateLabel": "State",
-    "play": "Play",
-    "pause": "Pause",
-    "resume": "Resume",
+    "playPauseAria": "Play or pause task",
     "stop": "Stop",
+    "refreshTasks": "Load tasks from controller",
     "logsTitle": "Execution logs",
     "noLogs": "No logs yet.",
     "startedTask": "Started task: {{task}}",
     "pausedByOperator": "Paused by operator.",
     "resumedByOperator": "Resumed by operator.",
     "stoppedByOperator": "Stopped by operator.",
+    "tasksLoaded": "Loaded {{count}} task(s) from controller.",
+    "taskPickerCancelled": "Task loading canceled.",
     "taskLoadError": "Unable to load tasks: {{error}}",
+    "taskReadFailed": "Unable to read task file: {{task}}",
     "runtimeError": "Execution error: {{error}}",
     "startFailed": "Failed to start the selected task.",
     "pauseFailed": "Failed to pause the running task.",
@@ -26,6 +28,13 @@
       "paused": "Paused",
       "stopped": "Stopped",
       "error": "Error"
+    },
+    "diagnostic": {
+      "ok": "Ready to execute.",
+      "servo_off": "Diagnostic: Servo OFF. Turn Servo ON before running.",
+      "not_auto_mode": "Diagnostic: Robot is not in AUTO mode.",
+      "servo_off_and_not_auto_mode": "Diagnostic: Servo OFF and robot not in AUTO mode.",
+      "no_task_selected": "Diagnostic: No task selected. Load tasks and select one."
     }
   }
 }

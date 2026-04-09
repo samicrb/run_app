@@ -1,20 +1,22 @@
 {
   "com.example.drltaskrunner": {
     "title": "DRL 프로세스 태스크 실행기",
-    "subtitle": "컨트롤러 태스크를 선택하고 재생/일시정지/정지로 실행을 제어하세요.",
-    "taskLabel": "태스크",
+    "subtitle": "컨트롤러의 기존 .drl 태스크를 불러온 뒤 재생/일시정지/정지로 제어합니다.",
+    "taskLabel": "컨트롤러 태스크",
     "stateLabel": "상태",
-    "play": "재생",
-    "pause": "일시정지",
-    "resume": "재개",
+    "playPauseAria": "태스크 재생 또는 일시정지",
     "stop": "정지",
+    "refreshTasks": "컨트롤러 태스크 불러오기",
     "logsTitle": "실행 로그",
     "noLogs": "로그가 없습니다.",
     "startedTask": "태스크 시작: {{task}}",
     "pausedByOperator": "작업자에 의해 일시정지됨.",
     "resumedByOperator": "작업자에 의해 재개됨.",
     "stoppedByOperator": "작업자에 의해 정지됨.",
+    "tasksLoaded": "컨트롤러에서 {{count}}개 태스크를 불러왔습니다.",
+    "taskPickerCancelled": "태스크 불러오기가 취소되었습니다.",
     "taskLoadError": "태스크 로딩 실패: {{error}}",
+    "taskReadFailed": "태스크 파일 읽기 실패: {{task}}",
     "runtimeError": "실행 오류: {{error}}",
     "startFailed": "선택한 태스크 시작 실패.",
     "pauseFailed": "실행 중 태스크 일시정지 실패.",
@@ -26,6 +28,13 @@
       "paused": "Paused",
       "stopped": "Stopped",
       "error": "Error"
+    },
+    "diagnostic": {
+      "ok": "실행 준비 완료.",
+      "servo_off": "진단: 서보 OFF 상태입니다. 실행 전에 Servo ON 하세요.",
+      "not_auto_mode": "진단: 로봇이 AUTO 모드가 아닙니다.",
+      "servo_off_and_not_auto_mode": "진단: Servo OFF 및 AUTO 모드 아님.",
+      "no_task_selected": "진단: 선택된 태스크가 없습니다. 태스크를 불러오고 선택하세요."
     }
   }
 }
