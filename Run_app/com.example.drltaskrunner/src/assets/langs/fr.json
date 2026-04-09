@@ -1,0 +1,40 @@
+{
+  "com.example.drltaskrunner": {
+    "title": "Exécuteur de tâches DRL",
+    "subtitle": "Chargez les tâches .drl existantes du contrôleur puis pilotez Lecture/Pause/Stop.",
+    "taskLabel": "Tâche contrôleur",
+    "stateLabel": "État",
+    "playPauseAria": "Lancer ou mettre en pause la tâche",
+    "stop": "Stop",
+    "refreshTasks": "Charger les tâches du contrôleur",
+    "logsTitle": "Logs d'exécution",
+    "noLogs": "Aucun log pour le moment.",
+    "startedTask": "Tâche démarrée : {{task}}",
+    "pausedByOperator": "Mise en pause par l'opérateur.",
+    "resumedByOperator": "Reprise par l'opérateur.",
+    "stoppedByOperator": "Arrêt par l'opérateur.",
+    "tasksLoaded": "{{count}} tâche(s) chargée(s) depuis le contrôleur.",
+    "taskPickerCancelled": "Chargement des tâches annulé.",
+    "taskLoadError": "Impossible de charger les tâches : {{error}}",
+    "taskReadFailed": "Impossible de lire la tâche : {{task}}",
+    "runtimeError": "Erreur d'exécution : {{error}}",
+    "startFailed": "Échec du démarrage de la tâche sélectionnée.",
+    "pauseFailed": "Échec de la mise en pause.",
+    "resumeFailed": "Échec de la reprise.",
+    "stopFailed": "Échec de l'arrêt.",
+    "state": {
+      "idle": "Idle",
+      "running": "Running",
+      "paused": "Paused",
+      "stopped": "Stopped",
+      "error": "Error"
+    },
+    "diagnostic": {
+      "ok": "Prêt à exécuter.",
+      "servo_off": "Diagnostic : Servo OFF. Activez les servos avant exécution.",
+      "not_auto_mode": "Diagnostic : Le robot n'est pas en mode AUTO.",
+      "servo_off_and_not_auto_mode": "Diagnostic : Servo OFF et robot hors mode AUTO.",
+      "no_task_selected": "Diagnostic : aucune tâche sélectionnée. Chargez puis sélectionnez une tâche."
+    }
+  }
+}
