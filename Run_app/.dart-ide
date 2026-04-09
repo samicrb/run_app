@@ -1,0 +1,20 @@
+{
+    "key": "Run_app_1.0.0_5_1775726442500",
+    "projectType": "Blank",
+    "projectGroup": null,
+    "templateInfo": {
+        "type": "Blank",
+        "title": "Blank",
+        "category": null,
+        "group": null,
+        "dartPackageInfo": {
+            "title": "",
+            "group": "",
+            "type": "",
+            "category": ""
+        }
+    },
+    "packageName": "com.example.drltaskrunner",
+    "ideMode": "basic",
+    "UserCommand": false
+}

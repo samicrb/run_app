@@ -1,0 +1,9 @@
+{
+    "name": "Run_app",
+    "packageName": "com.example.drltaskrunner",
+    "version": "1.0.0",
+    "sdkVersion": "5",
+    "icon": "assets/images/icon.png",
+    "drscModulePackageFile": "drsc_com.example.drltaskrunner.dm",
+    "drcfModulePackageFile": ""
+}
