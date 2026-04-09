@@ -1,0 +1,31 @@
+{
+  "com.example.drltaskrunner": {
+    "title": "Exécuteur de tâches DRL",
+    "subtitle": "Sélectionnez une tâche du contrôleur et pilotez l'exécution avec Lecture/Pause/Stop.",
+    "taskLabel": "Tâche",
+    "stateLabel": "État",
+    "play": "Lecture",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "stop": "Stop",
+    "logsTitle": "Logs d'exécution",
+    "noLogs": "Aucun log pour le moment.",
+    "startedTask": "Tâche démarrée : {{task}}",
+    "pausedByOperator": "Mise en pause par l'opérateur.",
+    "resumedByOperator": "Reprise par l'opérateur.",
+    "stoppedByOperator": "Arrêt par l'opérateur.",
+    "taskLoadError": "Impossible de charger les tâches : {{error}}",
+    "runtimeError": "Erreur d'exécution : {{error}}",
+    "startFailed": "Échec du démarrage de la tâche sélectionnée.",
+    "pauseFailed": "Échec de la mise en pause.",
+    "resumeFailed": "Échec de la reprise.",
+    "stopFailed": "Échec de l'arrêt.",
+    "state": {
+      "idle": "Idle",
+      "running": "Running",
+      "paused": "Paused",
+      "stopped": "Stopped",
+      "error": "Error"
+    }
+  }
+}

@@ -1,7 +1,10 @@
 {
     "main": "index.bundle.js",
     "usesPermissions": [],
-    "supportedLanguages": [],
+    "supportedLanguages": [
+        "en",
+        "fr"
+    ],
     "requiredPackageNames": [],
     "type": "PROCESS",
     "screens": [

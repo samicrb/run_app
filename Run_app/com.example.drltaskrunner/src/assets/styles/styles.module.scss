@@ -1,15 +1,55 @@
 /*
-    BSD 3-Clause License    
+    BSD 3-Clause License
     Copyright (c) 2023, Doosan Robotics Inc.
 */
-.container-sample {
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    position: relative;
-
-    .label-sample {
-        font-size: 15px;
-    }
+.process-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  gap: 12px;
 }
 
+.top-section {
+  flex: 1;
+  min-height: 0;
+}
+
+.state-row {
+  margin-top: 4px;
+}
+
+.state-chip {
+  padding: 0;
+}
+
+.log-panel {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 10px;
+  min-height: 140px;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-title {
+  font-weight: 700;
+}
+
+.log-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-item {
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.4;
+  word-break: break-word;
+}
