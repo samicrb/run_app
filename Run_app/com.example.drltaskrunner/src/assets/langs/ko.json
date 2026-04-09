@@ -1,5 +1,31 @@
 {
   "com.example.drltaskrunner": {
-    "welcome": "Dart-Suite에 오신 것을 환영합니다!"
+    "title": "DRL 프로세스 태스크 실행기",
+    "subtitle": "컨트롤러 태스크를 선택하고 재생/일시정지/정지로 실행을 제어하세요.",
+    "taskLabel": "태스크",
+    "stateLabel": "상태",
+    "play": "재생",
+    "pause": "일시정지",
+    "resume": "재개",
+    "stop": "정지",
+    "logsTitle": "실행 로그",
+    "noLogs": "로그가 없습니다.",
+    "startedTask": "태스크 시작: {{task}}",
+    "pausedByOperator": "작업자에 의해 일시정지됨.",
+    "resumedByOperator": "작업자에 의해 재개됨.",
+    "stoppedByOperator": "작업자에 의해 정지됨.",
+    "taskLoadError": "태스크 로딩 실패: {{error}}",
+    "runtimeError": "실행 오류: {{error}}",
+    "startFailed": "선택한 태스크 시작 실패.",
+    "pauseFailed": "실행 중 태스크 일시정지 실패.",
+    "resumeFailed": "일시정지된 태스크 재개 실패.",
+    "stopFailed": "실행 중 태스크 정지 실패.",
+    "state": {
+      "idle": "Idle",
+      "running": "Running",
+      "paused": "Paused",
+      "stopped": "Stopped",
+      "error": "Error"
+    }
   }
 }
